@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch-2.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop
+ 		http://www.springframework.org/schema/aop/spring-aop-3.1.xsd">
+
+
+
+	<job id="batchjob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="step1">
+			<tasklet>
+				<chunk reader="itemGenerator"
+			           writer="itemWriter"
+			           commit-interval="10"
+			           retry-limit="3">
+				    <retryable-exception-classes>
+				    	<include class="java.lang.Exception"/>
+				    </retryable-exception-classes>
+				</chunk>
+			</tasklet>
+		</step>
+	</job>
+
+	<bean id="itemGenerator" class="com.greedchina.gcrawler.batch.reader.DonghuaItemReader">
+	</bean>
+
+	<bean id="itemWriter" class="com.greedchina.gcrawler.batch.writer.DonghuaItemWriter" />
+	<bean id="jobRepository"
+	class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+			<property name="transactionManager" ref="transactionManager" />
+	</bean>
+	
+	<bean id="transactionManager"
+	class="org.springframework.batch.support.transaction.ResourcelessTransactionManager"/> 
+	
+
+	<bean id="cronTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+				<property name="jobDetail" ref="jobDetail" />
+				<property name="cronExpression" value="0/10 * * * * ?" />
+			</bean>
+
+	
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<ref bean="cronTrigger" />  
+	</property>
+	</bean>
+
+	<bean id="jobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+	    <property name="Durability" value="true"/>
+		<property name="jobClass" value="com.greedchina.gcrawler.batch.JobLauncherDetails" />
+		<property name="group" value="quartz-batch" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="jobName" value="batchjob"/>
+				<entry key="jobLocator" value-ref="jobRegistry"/>
+				<entry key="jobLauncher" value-ref="jobLauncher"/>
+			</map>
+		</property>
+	</bean>
+
+
+	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+	
+	
+	<bean id="jobRegistryBeanPostProcessor" class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
+		<property name="jobRegistry" ref="jobRegistry" />
+	</bean>
+
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="taskExecutor">
+			<bean class="org.springframework.core.task.SimpleAsyncTaskExecutor" />
+		</property>
+	</bean>
+	
+
+</beans>

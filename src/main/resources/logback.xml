@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+
+	<timestamp key="day" datePattern="yyyy-MM-dd"/>
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
+
+    <!-- To enable JMX Management -->
+    <jmxConfigurator/>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%-5level %logger{0} - %msg%n</pattern>
+        </encoder>
+    </appender>
+        <!-- Output to File -->
+    <appender name="FileHtml" class="ch.qos.logback.core.FileAppender">
+        <file>logs/Myapp-${day}.html</file>
+        <layout class="ch.qos.logback.classic.html.HTMLLayout">
+            <pattern>%date%level%thread%10logger%file%line%msg</pattern>
+        </layout>
+    </appender>
+
+	<!--<logger name="org.hibernate" level="debug"/> -->
+    <logger name="com.greedchina.gcrawler" level="debug"/>
+         
+    <root level="info">
+        <appender-ref ref="console"/>
+        <appender-ref ref="FileHtml"/>
+    </root>
+</configuration>
