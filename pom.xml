@@ -52,12 +52,6 @@
 		<version>${jsp.version}</version>
 		<scope>provided</scope>
 	</dependency>
-	<dependency>
-		<groupId>com.sun.xml.bind</groupId>
-		<artifactId>jaxb-impl</artifactId>
-		<version>${jaxb-impl.version}</version>
-		<scope>provided</scope>
-	</dependency>
  	<!-- SPRING, SPRING, SPRINGITY SPRING -->
 	<dependency>
 		<groupId>org.springframework.data</groupId>
@@ -226,7 +220,7 @@
 			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
-				<version>2.0</version>
+				<version>2.1</version>
 				<configuration>
 					<server>tomcat-development-server</server>
 					<port>9966</port>
